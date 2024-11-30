@@ -33,14 +33,29 @@ jobs:
         go mod tidy
         go mod vendor
 
-    - name: Run SonarQube Analysis
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    - name: Run SonarQube Analysis with Docker
+      working-directory: ./app1
       run: |
-        curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip
-        unzip sonar-scanner.zip
-        ./sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
-          -Dsonar.projectKey=amahmoodi181188_go-applications \
-          -Dsonar.sources=. \
+        docker run --rm \
+          -e SONAR_TOKEN=${{ secrets.SONAR_TOKEN }} \
+          -e SONAR_HOST_URL=${{ secrets.SONAR_HOST_URL }} \
+          -v "${{ github.workspace }}/app1:/usr/src" \
+          sonarsource/sonar-scanner-cli \
+          -Dsonar.projectKey=amahmoodi181188_go-applications-app1 \
+          -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Run SonarQube Analysis with Docker (app2)
+      working-directory: ./app2
+      run: |
+        docker run --rm \
+          -e SONAR_TOKEN=${{ secrets.SONAR_TOKEN }} \
+          -e SONAR_HOST_URL=${{ secrets.SONAR_HOST_URL }} \
+          -v "${{ github.workspace }}/app2:/usr/src" \
+          sonarsource/sonar-scanner-cli \
+          -Dsonar.projectKey=amahmoodi181188_go-applications-app2 \
+          -Dsonar.sources=/usr/src \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          
