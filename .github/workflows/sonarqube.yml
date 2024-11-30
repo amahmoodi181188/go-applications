@@ -41,7 +41,7 @@ jobs:
           -e SONAR_HOST_URL=${{ secrets.SONAR_HOST_URL }} \
           -v "${{ github.workspace }}/app1:/usr/src" \
           sonarsource/sonar-scanner-cli \
-          -Dsonar.projectKey=amahmoodi181188_go-applications \
+          -Dsonar.projectKey=amahmoodi181188_go-applications-app1 \
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
@@ -55,7 +55,7 @@ jobs:
           -e SONAR_HOST_URL=${{ secrets.SONAR_HOST_URL }} \
           -v "${{ github.workspace }}/app2:/usr/src" \
           sonarsource/sonar-scanner-cli \
-          -Dsonar.projectKey=amahmoodi181188_go-applications \
+          -Dsonar.projectKey=amahmoodi181188_go-applications-app2 \
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
