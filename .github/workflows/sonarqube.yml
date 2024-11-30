@@ -33,7 +33,7 @@ jobs:
         go mod tidy
         go mod vendor
 
-    - name: Run SonarQube Analysis with Docker
+    - name: Run SonarQube Analysis with Docker (App1)
       working-directory: ./app1
       run: |
         docker run --rm \
@@ -44,9 +44,10 @@ jobs:
           -Dsonar.projectKey=amahmoodi181188_go-applications-app1 \
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.organization=amahmoodi181188
 
-    - name: Run SonarQube Analysis with Docker (app2)
+    - name: Run SonarQube Analysis with Docker (App2)
       working-directory: ./app2
       run: |
         docker run --rm \
@@ -57,5 +58,5 @@ jobs:
           -Dsonar.projectKey=amahmoodi181188_go-applications-app2 \
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-          
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.organization=amahmoodi181188
