@@ -1,0 +1,44 @@
+name: SonarQube Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonarQube:
+    name: Run SonarQube Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.19' 
+
+    - name: Install Dependencies
+      run: |
+        go mod tidy
+        go mod vendor
+
+    - name: Run Tests (Optional)
+      run: |
+        go test ./... -v
+
+    - name: Run SonarQube Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.8.0.2856-linux.zip -o sonar-scanner.zip
+        unzip sonar-scanner.zip
+        ./sonar-scanner-4.8.0.2856-linux/bin/sonar-scanner \
+          -Dsonar.projectKey=amahmoodi181188_go-applications \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
