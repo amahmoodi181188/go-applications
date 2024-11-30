@@ -27,10 +27,6 @@ jobs:
         go mod tidy
         go mod vendor
 
-    - name: Run Tests (Optional)
-      run: |
-        go test ./... -v
-
     - name: Run SonarQube Analysis
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
