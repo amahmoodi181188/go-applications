@@ -21,17 +21,22 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'temurin' 
+        distribution: 'temurin'
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.19' 
+        go-version: '1.19'
 
-    - name: Install Dependencies
+    - name: Build App1
+      working-directory: ./app1
       run: |
-        go mod tidy
-        go mod vendor
+        go build -o app1
+
+    - name: Run Tests with Coverage for App1
+      working-directory: ./app1
+      run: |
+        go test -v ./... -coverprofile=coverage.out
 
     - name: Run SonarQube Analysis with Docker (App1)
       working-directory: ./app1
@@ -45,7 +50,18 @@ jobs:
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.organization=amahmoodi181188
+          -Dsonar.organization=amahmoodi181188 \
+          -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
+
+    - name: Build App2
+      working-directory: ./app2
+      run: |
+        go build -o app2
+
+    - name: Run Tests with Coverage for App2
+      working-directory: ./app2
+      run: |
+        go test -v ./... -coverprofile=coverage.out
 
     - name: Run SonarQube Analysis with Docker (App2)
       working-directory: ./app2
@@ -59,4 +75,6 @@ jobs:
           -Dsonar.sources=/usr/src \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          -Dsonar.organization=amahmoodi181188
+          -Dsonar.organization=amahmoodi181188 \
+          -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
+          
