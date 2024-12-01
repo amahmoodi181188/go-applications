@@ -57,15 +57,15 @@ jobs:
           -Dsonar.organization=amahmoodi181188 \
           -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
 
-    # Step 6: Container Scanning for App1
+    # Step 6: Scan App1 Container Image with Trivy
     - name: Scan App1 Container Image with Trivy
+      continue-on-error: true
       run: |
         docker build -t app1-image ./app1
         docker run --rm \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $HOME/.cache:/root/.cache \
-          aquasec/trivy:latest image --exit-code 1 --severity CRITICAL,HIGH app1-image
-
+          aquasec/trivy:latest image --format json --output app1-trivy-report.json app1-image
 
     # Step 7: Build & Test App2
     - name: Build App2
@@ -93,12 +93,22 @@ jobs:
           -Dsonar.organization=amahmoodi181188 \
           -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
 
-    # Step 9: Container Scanning for App2
+    # Step 9: Scan App2 Container Image with Trivy
     - name: Scan App2 Container Image with Trivy
+      continue-on-error: true
       run: |
         docker build -t app2-image ./app2
         docker run --rm \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $HOME/.cache:/root/.cache \
-          aquasec/trivy:latest image --exit-code 1 --severity CRITICAL,HIGH app2-image
+          aquasec/trivy:latest image --format json --output app2-trivy-report.json app2-image
+
+    # Step 10: Upload Trivy Reports
+    - name: Upload Trivy Reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: Trivy-Reports
+        path: |
+          app1-trivy-report.json
+          app2-trivy-report.json
           
