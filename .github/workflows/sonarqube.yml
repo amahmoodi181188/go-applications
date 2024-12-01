@@ -61,9 +61,11 @@ jobs:
     - name: Scan App1 Container Image with Trivy
       run: |
         docker build -t app1-image ./app1
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $HOME/.cache:/root/.cache aquasec/trivy:latest \
-          --exit-code 1 --severity CRITICAL,HIGH app1-image
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v $HOME/.cache:/root/.cache \
+          aquasec/trivy:latest image --exit-code 1 --severity CRITICAL,HIGH app1-image
+
 
     # Step 7: Build & Test App2
     - name: Build App2
@@ -95,7 +97,8 @@ jobs:
     - name: Scan App2 Container Image with Trivy
       run: |
         docker build -t app2-image ./app2
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-          -v $HOME/.cache:/root/.cache aquasec/trivy:latest \
-          --exit-code 1 --severity CRITICAL,HIGH app2-image
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v $HOME/.cache:/root/.cache \
+          aquasec/trivy:latest image --exit-code 1 --severity CRITICAL,HIGH app2-image
           
