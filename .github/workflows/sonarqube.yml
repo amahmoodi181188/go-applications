@@ -1,4 +1,4 @@
-name: SonarQube Analysis
+name: Secure Build and Analysis
 
 on:
   push:
@@ -9,35 +9,38 @@ on:
       - main
 
 jobs:
-  sonarQube:
-    name: Run SonarQube Analysis
+  secure-pipeline:
+    name: Static Analysis & Container Scanning
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout Code
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    # Step 2: Set up Java
     - name: Set up Java
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
 
+    # Step 3: Set up Go
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.19'
 
+    # Step 4: Build & Test App1
     - name: Build App1
       working-directory: ./app1
-      run: |
-        go build -o app1
+      run: go build -o app1
 
     - name: Run Tests with Coverage for App1
       working-directory: ./app1
-      run: |
-        go test -v ./... -coverprofile=coverage.out
+      run: go test -v ./... -coverprofile=coverage.out
 
+    # Step 5: Run SonarQube Analysis for App1
     - name: Run SonarQube Analysis with Docker (App1)
       working-directory: ./app1
       run: |
@@ -48,21 +51,30 @@ jobs:
           sonarsource/sonar-scanner-cli \
           -Dsonar.projectKey=amahmoodi181188_go-applications-app1 \
           -Dsonar.sources=/usr/src \
+          -Dsonar.go.sum.files=/usr/src/go.sum \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.organization=amahmoodi181188 \
           -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
 
+    # Step 6: Container Scanning for App1
+    - name: Scan App1 Container Image with Trivy
+      run: |
+        docker build -t app1-image ./app1
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          -v $HOME/.cache:/root/.cache aquasec/trivy:latest \
+          --exit-code 1 --severity CRITICAL,HIGH app1-image
+
+    # Step 7: Build & Test App2
     - name: Build App2
       working-directory: ./app2
-      run: |
-        go build -o app2
+      run: go build -o app2
 
     - name: Run Tests with Coverage for App2
       working-directory: ./app2
-      run: |
-        go test -v ./... -coverprofile=coverage.out
+      run: go test -v ./... -coverprofile=coverage.out
 
+    # Step 8: Run SonarQube Analysis for App2
     - name: Run SonarQube Analysis with Docker (App2)
       working-directory: ./app2
       run: |
@@ -73,8 +85,17 @@ jobs:
           sonarsource/sonar-scanner-cli \
           -Dsonar.projectKey=amahmoodi181188_go-applications-app2 \
           -Dsonar.sources=/usr/src \
+          -Dsonar.go.sum.files=/usr/src/go.sum \
           -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }} \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.organization=amahmoodi181188 \
           -Dsonar.go.coverage.reportPaths=/usr/src/coverage.out
+
+    # Step 9: Container Scanning for App2
+    - name: Scan App2 Container Image with Trivy
+      run: |
+        docker build -t app2-image ./app2
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+          -v $HOME/.cache:/root/.cache aquasec/trivy:latest \
+          --exit-code 1 --severity CRITICAL,HIGH app2-image
           
