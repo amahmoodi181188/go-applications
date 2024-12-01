@@ -65,7 +65,8 @@ jobs:
         docker run --rm \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $HOME/.cache:/root/.cache \
-          aquasec/trivy:latest image --format json --output app1-trivy-report.json app1-image
+          -v "${{ github.workspace }}:/reports" \
+          aquasec/trivy:latest image --format json --output /reports/app1-trivy-report.json app1-image
 
     # Step 7: Build & Test App2
     - name: Build App2
@@ -101,7 +102,8 @@ jobs:
         docker run --rm \
           -v /var/run/docker.sock:/var/run/docker.sock \
           -v $HOME/.cache:/root/.cache \
-          aquasec/trivy:latest image --format json --output app2-trivy-report.json app2-image
+          -v "${{ github.workspace }}:/reports" \
+          aquasec/trivy:latest image --format json --output /reports/app2-trivy-report.json app2-image
 
     # Step 10: Upload Trivy Reports
     - name: Upload Trivy Reports
@@ -111,4 +113,3 @@ jobs:
         path: |
           app1-trivy-report.json
           app2-trivy-report.json
-          
